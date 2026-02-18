@@ -1,0 +1,17 @@
+pandas
+numpy
+yfinance
+tqdm
+requests
+xgboost
+scikit-learn
+matplotlib
+shap
+feedparser
+joblib
+alpaca-py
+alpaca.trading.client
+alpaca.trading.requests
+datetime
+xml 
+os

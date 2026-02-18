@@ -1,0 +1,5 @@
+Data/sec_master_bulk_data.csv
+Data/historical_prices_db.csv
+venv/
+__pycache__/
+.DS_Store
