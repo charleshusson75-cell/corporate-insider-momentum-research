@@ -18,7 +18,7 @@ corporate-insider-momentum-research/
 │   └── portfolio_backtest.py    # Kelly Criterion simulated execution
 ├── Data/                        # (Excluded from Git) CSV datasets & Figures
 ├── Decision making/             # Strategy diagrams and flowcharts
-├── Some docs/                   # Academic paper (Overleaf PDF)
+├── Some docs/                   # Academic papers and personal paper on the project
 ├── requirements.txt             # Python dependencies
 └── README.md                    # This file
 
