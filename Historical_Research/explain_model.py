@@ -1,8 +1,9 @@
 """
 General description: 
-Opens the "Black Box" of the XGBoost model using SHAP (SHapley Additive exPlanations).
-Generates a State-of-the-Art visual Summary Plot showing exactly how much each feature 
-(e.g., Wolfpack Score, Volume) influenced the AI's buying decisions.
+Multi-Horizon SHAP Explainer.
+Opens the "Black Box" of the 1M, 2M, and 6M XGBoost models.
+Generates a Mean Feature Importance (Bar Chart) for each horizon to prove 
+how the AI's decision-making shifts from momentum to fundamental insider data over time.
 """
 
 import os
@@ -10,15 +11,17 @@ import joblib
 import shap
 import pandas as pd
 import matplotlib.pyplot as plt
+import warnings
+
+warnings.filterwarnings('ignore')
 
 # --- BULLETPROOF PATHS ---
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 INPUT_MATRIX = os.path.join(BASE_DIR, "Data", "ml_master_matrix.csv")
-MODEL_PATH = os.path.join(BASE_DIR, "Models", "xgboost_production_v1.pkl")
-OUTPUT_GRAPH = os.path.join(BASE_DIR, "Data", "ai_brain_weights.png")
+
+HORIZONS = ['1M', '2M', '6M']
 
 # --- EXACT FEATURE SPACE FROM TRAINING ---
-# This guarantees we only feed the AI the numbers it knows how to read
 FEATURES = [
     'Role_Weight', 
     'Consensus_Score', 
@@ -31,59 +34,52 @@ FEATURES = [
 ]
 
 def main():
-    if not os.path.exists(MODEL_PATH) or not os.path.exists(INPUT_MATRIX):
-        print("❌ Error: Cannot find model or master matrix. Run train_xgboost.py first.")
+    if not os.path.exists(INPUT_MATRIX):
+        print("❌ Error: Cannot find master matrix. Run feature engineering first.")
         return
 
-    print("🧠 Loading AI Model and Historical Features...")
-    
-    # 1. Load the exact model used for production
-    model = joblib.load(MODEL_PATH)
-    
-    # 2. Load the data the model was trained on
+    print("🧠 Loading Historical Features for SHAP Analysis...")
     df = pd.read_csv(INPUT_MATRIX)
-    
-    # Drop rows with missing values in our features (same as training)
     df.dropna(subset=FEATURES, inplace=True)
-    
-    # Explicitly isolate ONLY the numerical features the model expects
     features_df = df[FEATURES]
     
-    # To save time and memory, sample 2,000 random trades to calculate SHAP
+    # Sample to keep computation fast
     if len(features_df) > 2000:
         features_sample = features_df.sample(n=2000, random_state=42)
     else:
         features_sample = features_df
 
-    print("🔬 Calculating SHAP values (This opens the Black Box)...")
-    
-    # 3. Generate the SHAP Explainer
-    explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(features_sample)
-    
-    # 4. Draw and Save the SOTA Graph (Clean Bar Chart)
-    plt.figure(figsize=(10, 6))
-    
-    # ADD plot_type="bar" HERE:
-    shap.summary_plot(shap_values, features_sample, plot_type="bar", show=False)
-    
-    plt.title("XGBoost Insider Trading: Mean Feature Importance", fontsize=14, pad=20)
-    plt.xlabel("Mean |SHAP value| (Average impact on model output magnitude)")
-    plt.tight_layout()
-    
-    # Save the new clean graph
-    os.makedirs(os.path.dirname(OUTPUT_GRAPH), exist_ok=True)
-    plt.savefig(OUTPUT_GRAPH, dpi=300, bbox_inches='tight')
-    plt.close()
-    
-    print("-" * 60)
-    print(f"✅ SUCCESS: AI Brain Weights saved to: {OUTPUT_GRAPH}")
-    print("-" * 60)
-    print("How to read the graph:")
-    print(" - Red dots = High value of that feature")
-    print(" - Blue dots = Low value of that feature")
-    print(" - Dots pushed to the RIGHT = Increased confidence to BUY")
-    print(" - Dots pushed to the LEFT = Decreased confidence (Avoid)")
+    for horizon in HORIZONS:
+        model_path = os.path.join(BASE_DIR, "Models", f"xgboost_production_{horizon}.pkl")
+        output_graph = os.path.join(BASE_DIR, "Data", f"ai_brain_weights_{horizon}.png")
+        
+        if not os.path.exists(model_path):
+            print(f"⚠️ Skipping {horizon}: Model not found at {model_path}")
+            continue
+
+        print(f"\n🔬 Calculating SHAP values for {horizon} Horizon...")
+        model = joblib.load(model_path)
+        
+        explainer = shap.TreeExplainer(model)
+        shap_values = explainer.shap_values(features_sample)
+        
+        # Draw the Bar Graph
+        plt.figure(figsize=(10, 6))
+        
+        # plot_type="bar" forces the clean Mean Absolute Importance chart
+        shap.summary_plot(shap_values, features_sample, plot_type="bar", show=False)
+        
+        plt.title(f"XGBoost Feature Importance ({horizon} Horizon)", fontsize=14, pad=20)
+        plt.xlabel("Mean |SHAP value| (Average impact on model output)")
+        plt.tight_layout()
+        
+        # Save and close memory
+        plt.savefig(output_graph, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"✅ SUCCESS: {horizon} Brain Weights saved to: {output_graph}")
+
+    print("\n🎉 All SHAP visualizations complete. Check your Data folder!")
 
 if __name__ == "__main__":
     main()
