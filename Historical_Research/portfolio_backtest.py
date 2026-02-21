@@ -22,7 +22,7 @@ HOLDING_PERIOD = 21          # Number of trading days a trade is held
 TRADING_FRICTION = 0.000     # Zero fees on Alpaca
 
 # Let's test from 50% to 80%
-THRESHOLDS_TO_TEST = np.arange(0.50, 0.81, 0.01)
+THRESHOLDS_TO_TEST = np.arange(0.30, 0.81, 0.02)
 
 def main():
     if not os.path.exists(INPUT_FILE):

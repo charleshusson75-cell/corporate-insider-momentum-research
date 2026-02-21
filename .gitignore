@@ -3,3 +3,4 @@ Data/historical_prices_db.csv
 venv/
 __pycache__/
 .DS_Store
+*.csv

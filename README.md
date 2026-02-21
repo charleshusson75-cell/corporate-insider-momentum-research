@@ -10,7 +10,7 @@ While retail traders operate on delayed public news, corporate insiders (CEOs, C
 ## 📂 Repository Structure
 ```text
 corporate-insider-momentum-research/
-├── 01_Historical_Research/
+├── Historical_Research/
 │   ├── insider_scraper.py       # Scrapes SEC EDGAR (2010-2025)
 │   ├── market_data_fetcher.py   # Builds local price DB via Yahoo Fin
 │   ├── feature_engineering.py   # Calculates ATR-14, Volume Abs, Wolfpack Score
