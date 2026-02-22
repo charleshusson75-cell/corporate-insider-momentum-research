@@ -7,7 +7,7 @@ This repository contains the quantitative research, data engineering pipeline, a
 
 While retail traders operate on delayed public news, corporate insiders (CEOs, CFOs, board members) possess material, non-public information. By algorithmically filtering the noise of routine and liquidity-driven insider trading, this project isolates opportunistic, high-conviction "Wolfpack" buying behavior to generate market-beating returns. 
 
-📄 **Read the full academic research paper:** [`Replicating_Corporate_Insider_Alpha_via_ML.pdf`](./Replicating_Corporate_Insider_Alpha_via_ML.pdf)
+📄 **Read the full academic research paper:** [`Replicating_corporate_insider_alpha_via_ML.pdf`](./Replicating_corporate_insider_alpha_via_ML.pdf)
 
 ---
 
