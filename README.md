@@ -1,4 +1,3 @@
-```markdown
 # 📈 Corporate Insider Momentum: Replicating Alpha via Machine Learning
 
 **Status:** Completed (Historical Backtest) | **Language:** Python | **Model:** XGBoost
@@ -136,6 +135,3 @@ python Historical_Research/explain_model.py
 
 *Disclaimer: This repository is for academic and quantitative research purposes only. It does not constitute financial advice. The live execution engine (API keys, order routing, and cloud automation) is maintained in a separate, private repository to protect proprietary infrastructure.*
 
-```
-
-```
