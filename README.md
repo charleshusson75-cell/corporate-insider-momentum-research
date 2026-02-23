@@ -17,35 +17,35 @@ The architecture is strictly modular to prevent data leakage between ingestion, 
 
 ```text
 corporate-insider-momentum-research/
-├── .github/                                     # CI/CD and Cloud Automation workflows
-├── Replicating_Corporate_Insider_Alpha_via_ML.pdf # Full Academic Whitepaper
-├── README.md                                    # This file
-├── requirements.txt                             # Python dependencies
+├── .github/                                       # CI/CD and Cloud Automation workflows
+├── Replicating_corporate_insider_alpha_via_ML.pdf # Full Academic Whitepaper
+├── README.md                                      # This file
+├── requirements.txt                               # Python dependencies
 │
-├── Decision making/                             # Strategy rules and flowcharts
+├── Decision making/                               # Strategy rules and flowcharts
 │   ├── Criterion.txt
 │   ├── Decision.txt
 │   └── variables.txt
 │
-├── Data/                                        # Local Data Warehouse (Ignored in Git)
-│   ├── ai_brain_weights_1M.png                  # SHAP visualizations
-│   ├── strategy_vs_spy_1M.png                   # Equity Curve outputs
-│   ├── sec_master_bulk_data.csv                 # Raw EDGAR filings
-│   ├── ml_master_matrix.csv                     # Final ML-ready dataset
-│   ├── ai_buy_signals_master.csv                # Consolidated AI probabilities (1M, 2M, 6M)
-│   └── optimal_equity_curve_1M.csv              # Backtester trade logs and equity tracking
+├── Data/                                          # Local Data Warehouse (Ignored in Git)
+│   ├── ai_brain_weights_1M.png                    # SHAP visualizations
+│   ├── strategy_vs_spy_1M.png                     # Equity Curve outputs
+│   ├── sec_master_bulk_data.csv                   # Raw EDGAR filings
+│   ├── ml_master_matrix.csv                       # Final ML-ready dataset
+│   ├── ai_buy_signals_master.csv                  # Consolidated AI probabilities (1M, 2M, 6M)
+│   └── optimal_equity_curve_1M.csv                # Backtester trade logs and equity tracking
 │
-└── Historical_Research/                         # Core Research Environment
-    ├─ insider_scraper.py                        # 1. SEC EDGAR ingestion (2010-2025)
-    ├─ market_data_fetcher.py                    # 2. Yahoo Finance OHLCV mapping
-    ├─ generate_full_db_baseline.py              # 3. Database compilation
-    ├─ processor_cleaning.py                     # 4. Data sanitization & filtering
-    ├─ feature_engineering.py                    # 5. Technicals (ATR) & Consensus weighting
-    ├─ train_xgboost.py                          # 6. Multi-Horizon ML Model Training
-    ├─ explain_model.py                          # 7. SHAP Game-Theory Interpretation
-    ├─ portfolio_backtest.py                     # 8. Capital-Constrained Kelly Backtester
-    ├─ plot_performance.py                       # 9. Matplotlib Equity Visualizations
-    └─ trading_agent_groq.py                     # 10. LLM Reasoning Interface (Groq)
+└── Src/                                           # Core Research Environment
+    ├─ insider_scraper.py                          # 1. SEC EDGAR ingestion (2010-2025)
+    ├─ market_data_fetcher.py                      # 2. Yahoo Finance OHLCV mapping
+    ├─ generate_full_db_baseline.py                # 3. Database compilation
+    ├─ processor_cleaning.py                       # 4. Data sanitization & filtering
+    ├─ feature_engineering.py                      # 5. Technicals (ATR) & Consensus weighting
+    ├─ train_xgboost.py                            # 6. Multi-Horizon ML Model Training
+    ├─ explain_model.py                            # 7. SHAP Game-Theory Interpretation
+    ├─ portfolio_backtest.py                       # 8. Capital-Constrained Kelly Backtester
+    ├─ plot_performance.py                         # 9. Matplotlib Equity Visualizations
+    └─ trading_agent_groq.py                       # 10. LLM Reasoning Interface (Groq)
 
 ```
 
@@ -103,7 +103,7 @@ pip install -r requirements.txt
 Execute the data processing scripts sequentially to scrape the SEC, fetch Yahoo Finance data, and build the engineered features.
 
 ```bash
-python Historical_Research/feature_engineering.py
+python Src/feature_engineering.py
 
 ```
 
@@ -111,7 +111,7 @@ python Historical_Research/feature_engineering.py
 Train the multi-horizon AI brains. This will output the `.pkl` models and the consolidated AI signals CSV file.
 
 ```bash
-python Historical_Research/train_xgboost.py
+python Src/train_xgboost.py
 
 ```
 
@@ -119,7 +119,7 @@ python Historical_Research/train_xgboost.py
 Execute the portfolio simulation. This script applies the Kelly Criterion logic and outputs the optimal performance metrics to the console.
 
 ```bash
-python Historical_Research/portfolio_backtest.py
+python Src/portfolio_backtest.py
 
 ```
 
@@ -127,7 +127,7 @@ python Historical_Research/portfolio_backtest.py
 Generate the SOTA SHAP visualizations to verify feature importance.
 
 ```bash
-python Historical_Research/explain_model.py
+python Src/explain_model.py
 
 ```
 
@@ -135,3 +135,6 @@ python Historical_Research/explain_model.py
 
 *Disclaimer: This repository is for academic and quantitative research purposes only. It does not constitute financial advice. The live execution engine (API keys, order routing, and cloud automation) is maintained in a separate, private repository to protect proprietary infrastructure.*
 
+---
+
+© 2026 Charles Husson. All Rights Reserved. This repository is provided for academic review and portfolio demonstration purposes only. No license is granted for commercial or personal use.
