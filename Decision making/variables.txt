@@ -1,4 +1,0 @@
-- Veto if habit trade, salary compensation, or legacy transmission
-- Holding duration (depends if fund or else?)
-- Consensus timeframe across the board if eligible
-- Stop loss 
