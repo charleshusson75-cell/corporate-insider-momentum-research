@@ -30,6 +30,11 @@ corporate-insider-momentum-research/
 │   ├── ai_buy_signals_master.csv                  # consolidated ai probabilities
 │   └── optimal_equity_curve_1M.csv                # backtester trade logs and equity tracking
 │
+├── Models/                                        # serialized machine learning brains
+│   ├─ xgboost_production_1M.pkl                   
+│   ├─ xgboost_production_2M.pkl                   
+│   └─ xgboost_production_6M.pkl
+│
 └── Src/                                           # core research environment
     ├─ data_01_insider_scraper.py                  # sec edgar ingestion (2010-2025)
     ├─ data_02_market_fetcher.py                   # yahoo finance ohlcv mapping
