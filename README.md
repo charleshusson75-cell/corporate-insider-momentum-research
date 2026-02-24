@@ -17,7 +17,6 @@ The architecture is strictly modular to prevent data leakage between ingestion, 
 
 ```text
 corporate-insider-momentum-research/
-├── .github/                                       # ci/cd and cloud automation workflows
 ├── Replicating_corporate_insider_alpha_via_ML.pdf # full academic whitepaper
 ├── README.md                                      # this file
 ├── requirements.txt                               # python dependencies
@@ -124,8 +123,6 @@ python run_pipeline.py --mode wfo_run
 
 **4. View Results:**
 All quantitative performance metrics (CAGR, Sharpe, Max Drawdown) will output directly to the terminal. Generated `.pkl` models, trade logs, and visual performance charts are automatically saved to the `Data/` directory.
-
-```
 
 ---
 
