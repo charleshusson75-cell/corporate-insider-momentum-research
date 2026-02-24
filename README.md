@@ -1,6 +1,6 @@
 # 📈 Corporate Insider Momentum: Replicating Alpha via Machine Learning
 
-**Status:** Completed (Historical Backtest) | **Language:** Python | **Model:** XGBoost
+> 🚧 **Status: Active Development (Work in Progress)** > *Phase 1 (Static Multi-Horizon Backtesting) is complete. Phase 2 (Combinatorial Walk-Forward Optimization) is currently being implemented.*
 
 ## Overview
 This repository contains the quantitative research, data engineering pipeline, and historical backtesting engine for an algorithmic trading strategy based on SEC Form 4 corporate insider disclosures.
@@ -22,13 +22,9 @@ corporate-insider-momentum-research/
 ├── requirements.txt                               # python dependencies
 ├── run_pipeline.py                                # master command-line orchestrator
 │
-├── Data/                                          # local data warehouse (csv files ignored in git)
-│   ├── ai_brain_weights_1M.png                    # shap visualizations
-│   ├── strategy_vs_spy_1M.png                     # equity curve outputs
-│   ├── sec_master_bulk_data.csv                   # raw edgar filings
-│   ├── ml_master_matrix.csv                       # final ml-ready dataset
-│   ├── ai_buy_signals_master.csv                  # consolidated ai probabilities
-│   └── optimal_equity_curve_1M.csv                # backtester trade logs and equity tracking
+├── Data/                                          # Local data warehouse (Raw & Processed)
+│   ├── [*.csv]                                    # DBs (heaviest ones are ignored by git), signals and logs
+│   └── [*.png]                                    # SHAP plots and equity curves
 │
 ├── Models/                                        # serialized machine learning brains
 │   ├─ xgboost_production_1M.pkl                   
@@ -42,9 +38,12 @@ corporate-insider-momentum-research/
     ├─ feat_04_cleaning.py                         # data sanitization & filtering
     ├─ feat_05_engineering.py                      # technicals (atr) & consensus weighting
     ├─ model_06_train_static.py                    # static multi-horizon model training
+    ├─ model_06_train_wfo.py                       # wfo multi-horizon model training 
     ├─ model_07_explain_shap.py                    # shap game-theory interpretation
-    ├─ quant_08_backtest_static.py                 # capital-constrained kelly backtester
-    └─ viz_09_performance.py                       # matplotlib equity visualizations
+    ├─ quant_08_backtest_static.py                 # capital-constrained kelly backtester (static)
+    ├─ quant_08_backtest_wfo.py                    # capital-constrained kelly backtester (wfo)
+    ├─ quant_09_rolling_baseline.py                # naive fully-invested benchmark
+    └─ viz_10_performance.py                       # matplotlib equity visualizations
 
 ```
 
