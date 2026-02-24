@@ -17,7 +17,13 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
+# ==========================================
+# --- CONFIGURATION & HYPERPARAMETERS ---
+# ==========================================
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+INPUT_FILE = os.path.join(BASE_DIR, "Data", "ai_buy_signals.csv")
 
 STARTING_CAPITAL = 100000.00
 STOP_LOSS_PCT = -0.10
@@ -34,9 +40,12 @@ HORIZON_CONFIGS = {
 def main():
     print("💼 Booting Institutional Multi-Horizon Kelly Backtester...\n")
 
+    if not os.path.exists(INPUT_FILE):
+        print(f"❌ File {INPUT_FILE} not found. Run XGBoost first.")
+        return
+
     for horizon, config in HORIZON_CONFIGS.items():
-        # Point to the unified file for every loop
-        input_file = os.path.join(BASE_DIR, "Data", "ai_buy_signals.csv")
+        # Dynamic Output Paths
         output_equity = os.path.join(BASE_DIR, "Data", f"optimal_equity_curve_{horizon}.csv")
         output_trades = os.path.join(BASE_DIR, "Data", f"trade_log_{horizon}.csv")
         output_graph = os.path.join(BASE_DIR, "Data", f"strategy_vs_spy_{horizon}.png")
@@ -44,12 +53,8 @@ def main():
         holding_period = config['hold_days']
         ret_col = config['ret_col']
         confidence_col = f'AI_Confidence_{horizon}' # Dynamic column targeting
-
-        if not os.path.exists(input_file):
-            print(f"⚠️ Skipping {horizon}: File {input_file} not found. Run XGBoost first.")
-            continue
             
-        df = pd.read_csv(input_file, parse_dates=['Trade_Date'])
+        df = pd.read_csv(INPUT_FILE, parse_dates=['Trade_Date'])
         # Drop rows where this specific horizon has no predictions
         df.dropna(subset=[confidence_col, ret_col], inplace=True)
         
@@ -131,7 +136,7 @@ def main():
                 todays_signals = loop_df[loop_df['Trade_Date'] == current_date]
                 for _, trade in todays_signals.iterrows():
                     max_bet_dollars = current_equity * dynamic_risk_pct 
-                    bet_size = max_bet_dollars * trade[confidence_col] # Updated to use horizon-specific confidence
+                    bet_size = max_bet_dollars * trade[confidence_col] # Uses horizon-specific confidence
                     
                     if current_cash >= bet_size:
                         current_cash -= bet_size

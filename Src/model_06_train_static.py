@@ -18,7 +18,7 @@ warnings.filterwarnings('ignore')
 # ==========================================
 
 INPUT_FILE = "Data/ml_master_matrix.csv"
-OUTPUT_CSV = "Data/ai_buy_signals.csv"  # The new unified output file
+OUTPUT_CSV = "Data/ai_buy_signals.csv"
 CONFIDENCE_THRESHOLD = 0.00  
 
 # --- THE HORIZONS TO TRAIN ---
