@@ -10,6 +10,3 @@ shap
 feedparser
 joblib
 alpaca-py
-datetime
-xml 
-os
