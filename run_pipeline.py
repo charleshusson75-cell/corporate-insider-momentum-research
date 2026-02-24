@@ -39,13 +39,14 @@ def main():
         "Src/model_06_train_static.py",
         "Src/model_07_explain_shap.py",
         "Src/quant_08_backtest_static.py",
-        "Src/viz_09_performance.py"
+        "Src/quant_09_rolling_baseline.py",
+        "Src/viz_10_performance.py"
     ]
 
     wfo_scripts = [
         # "Src/model_06_train_wfo.py",
         # "Src/quant_08_backtest_wfo.py",
-        # "Src/viz_09_performance.py"
+        # "Src/viz_10_performance.py"
     ]
 
     # 3. Execute based on the user's terminal choice
