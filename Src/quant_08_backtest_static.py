@@ -1,8 +1,8 @@
 """
 General description: 
 Institutional-Grade Multi-Horizon Backtester.
-Loops through 1M, 2M, and 6M AI signals. Runs Kelly Optimization, 
-tracks ML metrics (AUC, F1), calculates Quant Metrics (Sharpe, Max Drawdown), 
+Loops through 1M, 2M, and 6M AI signals from the unified signals file. 
+Runs Kelly Optimization, tracks ML metrics (AUC, F1), calculates Quant Metrics, 
 exports detailed trade logs, and generates comparative equity curve graphs vs the S&P 500.
 """
 
@@ -35,19 +35,24 @@ def main():
     print("💼 Booting Institutional Multi-Horizon Kelly Backtester...\n")
 
     for horizon, config in HORIZON_CONFIGS.items():
-        input_file = os.path.join(BASE_DIR, "Data", f"ai_buy_signals_{horizon}.csv")
+        # Point to the unified file for every loop
+        input_file = os.path.join(BASE_DIR, "Data", "ai_buy_signals.csv")
         output_equity = os.path.join(BASE_DIR, "Data", f"optimal_equity_curve_{horizon}.csv")
         output_trades = os.path.join(BASE_DIR, "Data", f"trade_log_{horizon}.csv")
         output_graph = os.path.join(BASE_DIR, "Data", f"strategy_vs_spy_{horizon}.png")
         
         holding_period = config['hold_days']
         ret_col = config['ret_col']
+        confidence_col = f'AI_Confidence_{horizon}' # Dynamic column targeting
 
         if not os.path.exists(input_file):
             print(f"⚠️ Skipping {horizon}: File {input_file} not found. Run XGBoost first.")
             continue
             
         df = pd.read_csv(input_file, parse_dates=['Trade_Date'])
+        # Drop rows where this specific horizon has no predictions
+        df.dropna(subset=[confidence_col, ret_col], inplace=True)
+        
         if len(df) == 0:
             print(f"⚠️ Skipping {horizon}: No data in file.")
             continue
@@ -59,7 +64,7 @@ def main():
 
         # --- GLOBAL ML METRICS ---
         actual_wins = (df[ret_col] > 0).astype(int)
-        global_auc = roc_auc_score(actual_wins, df['AI_Confidence'])
+        global_auc = roc_auc_score(actual_wins, df[confidence_col])
 
         print(f"=====================================================================================")
         print(f"🚀 RUNNING HORIZON: {horizon} ({holding_period} Trading Days Hold)")
@@ -70,12 +75,12 @@ def main():
         results = []
 
         for threshold in THRESHOLDS_TO_TEST:
-            loop_df = df[df['AI_Confidence'] >= threshold].copy()
+            loop_df = df[df[confidence_col] >= threshold].copy()
             if len(loop_df) < 20: continue
 
             # ML Metrics
             selection_pct = len(loop_df) / len(df)
-            predicted_binary = (df['AI_Confidence'] >= threshold).astype(int)
+            predicted_binary = (df[confidence_col] >= threshold).astype(int)
             f1 = f1_score(actual_wins, predicted_binary)
 
             # Kelly Math
@@ -126,7 +131,7 @@ def main():
                 todays_signals = loop_df[loop_df['Trade_Date'] == current_date]
                 for _, trade in todays_signals.iterrows():
                     max_bet_dollars = current_equity * dynamic_risk_pct 
-                    bet_size = max_bet_dollars * trade['AI_Confidence']
+                    bet_size = max_bet_dollars * trade[confidence_col] # Updated to use horizon-specific confidence
                     
                     if current_cash >= bet_size:
                         current_cash -= bet_size

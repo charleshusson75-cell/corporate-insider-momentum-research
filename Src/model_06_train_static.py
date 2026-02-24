@@ -1,8 +1,8 @@
 """
 General description: 
 Trains three separate XGBoost classifiers for 1-Month, 2-Month, and 6-Month horizons.
-Exports the AI's official "BUY" signals and trained models for each specific timeframe,
-using the exact original feature set.
+Fuses the AI's official "BUY" signals into a single master CSV file, and exports 
+trained models for each specific timeframe using the exact original feature set.
 """
 
 import pandas as pd
@@ -18,6 +18,7 @@ warnings.filterwarnings('ignore')
 # ==========================================
 
 INPUT_FILE = "Data/ml_master_matrix.csv"
+OUTPUT_CSV = "Data/ai_buy_signals.csv"  # The new unified output file
 CONFIDENCE_THRESHOLD = 0.00  
 
 # --- THE HORIZONS TO TRAIN ---
@@ -49,6 +50,9 @@ def main():
     # Sort chronologically to prevent "Look-Ahead Bias"
     df.sort_values('Trade_Date', ascending=True, inplace=True)
     SPLIT_DATE = '2020-01-01'
+    
+    # Create the master test dataframe that will hold all fused columns
+    master_test_df = df[df['Trade_Date'] >= SPLIT_DATE].copy()
 
     # 2. LOOP THROUGH EACH HORIZON
     for horizon in HORIZONS:
@@ -58,6 +62,7 @@ def main():
         
         target_col = f'Target_{horizon}'
         ret_col = f'Ret_{horizon}'
+        confidence_col = f'AI_Confidence_{horizon}' # New dynamic column name
         
         # Check if the columns actually exist in the DB
         if target_col not in df.columns or ret_col not in df.columns:
@@ -82,26 +87,22 @@ def main():
         )
         model.fit(X_train, y_train)
         
-        # 4. PREDICT & FILTER
-        test_df['AI_Confidence'] = model.predict_proba(X_test)[:, 1]
-        buy_signals = test_df[test_df['AI_Confidence'] >= CONFIDENCE_THRESHOLD]
+        # 4. PREDICT 
+        # Inject predictions directly into the unified master_test_df using index matching
+        master_test_df.loc[test_df.index, confidence_col] = model.predict_proba(X_test)[:, 1]
         
         # 5. DYNAMIC EXPORT PATHS
-        output_csv = f"Data/ai_buy_signals_{horizon}.csv"
         output_model = f"Models/xgboost_production_{horizon}.pkl"
-        
         os.makedirs(os.path.dirname(output_model), exist_ok=True)
-        
-        # Save Signals
-        buy_signals.to_csv(output_csv, index=False)
-        print(f"✅ Generated {len(buy_signals)} high-confidence BUY signals.")
-        print(f"💾 Saved Signals to: {output_csv}")
         
         # Save Model
         joblib.dump(model, output_model) 
         print(f"💾 Saved Brain to: {output_model}")
 
-    print("\n🎉 ALL HORIZONS TRAINED SUCCESSFULLY!")
+    # Save Unified Signals at the very end
+    master_test_df.to_csv(OUTPUT_CSV, index=False)
+    print(f"\n✅ Fused Master Signals saved to: {OUTPUT_CSV}")
+    print("🎉 ALL HORIZONS TRAINED SUCCESSFULLY!")
 
 if __name__ == "__main__":
     main()
