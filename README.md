@@ -83,13 +83,6 @@ The system was evaluated across three distinct holding horizons, revealing a mas
 
 ---
 
-I am glad you love it! Yes, using an orchestrator script with CLI arguments (`argparse`) is exactly how quantitative researchers hand off pipelines to production engineers. It removes human error and proves you know how to build software, not just run Jupyter Notebooks.
-
-Here is the fully updated, highly professional `## 🧪 How to Run / Reproduce` section for your `README.md`. It replaces your old 5-step manual process with the sleek new CLI interface.
-
-Copy and paste this directly into your Readme:
-
-```markdown
 ## 🧪 How to Run / Reproduce
 
 This research environment is orchestrated via a master Command Line Interface (CLI) script (`run_pipeline.py`) to ensure strict reproducibility and modular auditing.
