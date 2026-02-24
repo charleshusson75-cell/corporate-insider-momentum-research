@@ -17,35 +17,30 @@ The architecture is strictly modular to prevent data leakage between ingestion, 
 
 ```text
 corporate-insider-momentum-research/
-├── .github/                                       # CI/CD and Cloud Automation workflows
-├── Replicating_corporate_insider_alpha_via_ML.pdf # Full Academic Whitepaper
-├── README.md                                      # This file
-├── requirements.txt                               # Python dependencies
+├── .github/                                       # ci/cd and cloud automation workflows
+├── Replicating_corporate_insider_alpha_via_ML.pdf # full academic whitepaper
+├── README.md                                      # this file
+├── requirements.txt                               # python dependencies
+├── run_pipeline.py                                # master command-line orchestrator
 │
-├── Decision making/                               # Strategy rules and flowcharts
-│   ├── Criterion.txt
-│   ├── Decision.txt
-│   └── variables.txt
+├── Data/                                          # local data warehouse (csv files ignored in git)
+│   ├── ai_brain_weights_1M.png                    # shap visualizations
+│   ├── strategy_vs_spy_1M.png                     # equity curve outputs
+│   ├── sec_master_bulk_data.csv                   # raw edgar filings
+│   ├── ml_master_matrix.csv                       # final ml-ready dataset
+│   ├── ai_buy_signals_master.csv                  # consolidated ai probabilities
+│   └── optimal_equity_curve_1M.csv                # backtester trade logs and equity tracking
 │
-├── Data/                                          # Local Data Warehouse (Ignored in Git)
-│   ├── ai_brain_weights_1M.png                    # SHAP visualizations
-│   ├── strategy_vs_spy_1M.png                     # Equity Curve outputs
-│   ├── sec_master_bulk_data.csv                   # Raw EDGAR filings
-│   ├── ml_master_matrix.csv                       # Final ML-ready dataset
-│   ├── ai_buy_signals_master.csv                  # Consolidated AI probabilities (1M, 2M, 6M)
-│   └── optimal_equity_curve_1M.csv                # Backtester trade logs and equity tracking
-│
-└── Src/                                           # Core Research Environment
-    ├─ insider_scraper.py                          # 1. SEC EDGAR ingestion (2010-2025)
-    ├─ market_data_fetcher.py                      # 2. Yahoo Finance OHLCV mapping
-    ├─ generate_full_db_baseline.py                # 3. Database compilation
-    ├─ processor_cleaning.py                       # 4. Data sanitization & filtering
-    ├─ feature_engineering.py                      # 5. Technicals (ATR) & Consensus weighting
-    ├─ train_xgboost.py                            # 6. Multi-Horizon ML Model Training
-    ├─ explain_model.py                            # 7. SHAP Game-Theory Interpretation
-    ├─ portfolio_backtest.py                       # 8. Capital-Constrained Kelly Backtester
-    ├─ plot_performance.py                         # 9. Matplotlib Equity Visualizations
-    └─ trading_agent_groq.py                       # 10. LLM Reasoning Interface (Groq)
+└── Src/                                           # core research environment
+    ├─ data_01_insider_scraper.py                  # sec edgar ingestion (2010-2025)
+    ├─ data_02_market_fetcher.py                   # yahoo finance ohlcv mapping
+    ├─ data_03_db_baseline.py                      # database compilation
+    ├─ feat_04_cleaning.py                         # data sanitization & filtering
+    ├─ feat_05_engineering.py                      # technicals (atr) & consensus weighting
+    ├─ model_06_train_static.py                    # static multi-horizon model training
+    ├─ model_07_explain_shap.py                    # shap game-theory interpretation
+    ├─ quant_08_backtest_static.py                 # capital-constrained kelly backtester
+    └─ viz_09_performance.py                       # matplotlib equity visualizations
 
 ```
 
@@ -88,46 +83,54 @@ The system was evaluated across three distinct holding horizons, revealing a mas
 
 ---
 
+I am glad you love it! Yes, using an orchestrator script with CLI arguments (`argparse`) is exactly how quantitative researchers hand off pipelines to production engineers. It removes human error and proves you know how to build software, not just run Jupyter Notebooks.
+
+Here is the fully updated, highly professional `## 🧪 How to Run / Reproduce` section for your `README.md`. It replaces your old 5-step manual process with the sleek new CLI interface.
+
+Copy and paste this directly into your Readme:
+
+```markdown
 ## 🧪 How to Run / Reproduce
 
-To replicate the backtest results and generate the visual charts:
+This research environment is orchestrated via a master Command Line Interface (CLI) script (`run_pipeline.py`) to ensure strict reproducibility and modular auditing.
 
 **1. Install Dependencies:**
-
 ```bash
 pip install -r requirements.txt
 
 ```
 
-**2. Generate the Master Database:**
-Execute the data processing scripts sequentially to scrape the SEC, fetch Yahoo Finance data, and build the engineered features.
+**2. Run the Full Pipeline (End-to-End):**
+By default, the orchestrator will execute the entire sequence from scratch: SEC EDGAR ingestion, feature engineering, multi-horizon AI training, and the Kelly Criterion backtest.
 
 ```bash
-python Src/feature_engineering.py
+python run_pipeline.py --mode full
 
 ```
 
-**3. Train the XGBoost Models:**
-Train the multi-horizon AI brains. This will output the `.pkl` models and the consolidated AI signals CSV file.
+**3. Modular Execution (Component Auditing):**
+If you wish to isolate specific environments of the pipeline without rebuilding the entire dataset, pass the `--mode` flag:
 
+* **Build the Data Warehouse Only:** (Scrapes SEC, fetches OHLCV, engineers technical features)
 ```bash
-python Src/train_xgboost.py
+python run_pipeline.py --mode data_only
 
 ```
 
-**4. Run the Institutional Backtest:**
-Execute the portfolio simulation. This script applies the Kelly Criterion logic and outputs the optimal performance metrics to the console.
-
+* **Run the Static AI & Backtest Only:** (Trains the XGBoost models on pre-built data, evaluates Kelly position sizing, and generates SHAP game-theory graphs)
 ```bash
-python Src/portfolio_backtest.py
+python run_pipeline.py --mode static_run
 
 ```
 
-**5. (Optional) Audit the AI Brain:**
-Generate the SOTA SHAP visualizations to verify feature importance.
-
+* **Run the Walk-Forward Optimization:** (Executes rigorous out-of-sample rolling window testing)
 ```bash
-python Src/explain_model.py
+python run_pipeline.py --mode wfo_run
+
+```
+
+**4. View Results:**
+All quantitative performance metrics (CAGR, Sharpe, Max Drawdown) will output directly to the terminal. Generated `.pkl` models, trade logs, and visual performance charts are automatically saved to the `Data/` directory.
 
 ```
 
