@@ -3,14 +3,12 @@ General description:
 Institutional-Grade Multi-Horizon Backtester for Walk-Forward Optimization (WFO).
 Loops through 1M, 2M, and 6M AI signals from the strictly out-of-sample WFO file. 
 Runs Kelly Optimization, tracks ML metrics (AUC, F1), calculates Quant Metrics, 
-exports detailed trade logs, and generates comparative equity curve graphs vs the S&P 500.
+and exports detailed trade logs and optimal equity curves.
 """
 
 import pandas as pd
 import numpy as np
 import os
-import yfinance as yf
-import matplotlib.pyplot as plt
 from sklearn.metrics import roc_auc_score, f1_score
 from datetime import timedelta
 import warnings
@@ -49,7 +47,6 @@ def main():
         # Dynamic Output Paths with _wfo appended
         output_equity = os.path.join(BASE_DIR, "Data", f"optimal_equity_curve_{horizon}_wfo.csv")
         output_trades = os.path.join(BASE_DIR, "Data", f"trade_log_{horizon}_wfo.csv")
-        output_graph = os.path.join(BASE_DIR, "Data", f"strategy_vs_spy_{horizon}_wfo.png")
         
         holding_period = config['hold_days']
         ret_col = config['ret_col']
@@ -206,34 +203,8 @@ def main():
             print("-" * 85)
             print(f"🏆 OPTIMAL {horizon} WFO STRATEGY DISCOVERED")
             print(f"Metrics: Sharpe {best['Sharpe']:.2f} | Max DD {best['Max_DD']*100:.1f}% | Trades: {best['Trades']}")
-            
-            # 2. Download S&P 500 Benchmark and Plot
-            print(f"📉 Generating comparative WFO graph vs S&P 500 for {horizon}...")
-            spy = yf.download('SPY', start=first_trade.strftime('%Y-%m-%d'), end=last_trade.strftime('%Y-%m-%d'), progress=False)
-            spy['SPY_Normalized'] = (spy['Close'] / spy['Close'].iloc[0]) * STARTING_CAPITAL
-            
-            eq_df = best['Equity_Curve'].set_index('Date')
-            
-            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={'height_ratios': [3, 1]})
-            
-            # Using purple for WFO charts so you don't confuse them with the static blue ones
-            ax1.plot(eq_df.index, eq_df['Strategy_Equity'], label=f"WFO Strategy ({best['CAGR']*100:.1f}% CAGR)", color='purple', linewidth=2)
-            ax1.plot(spy.index, spy['SPY_Normalized'], label="S&P 500 Baseline", color='gray', linestyle='--')
-            ax1.set_title(f"Walk-Forward AI Momentum vs S&P 500 ({horizon} Horizon)")
-            ax1.set_ylabel("Portfolio Value ($)")
-            ax1.legend()
-            ax1.grid(alpha=0.3)
-            
-            ax2.fill_between(eq_df.index, eq_df['Pct_Invested'] * 100, color='purple', alpha=0.2)
-            ax2.plot(eq_df.index, eq_df['Pct_Invested'] * 100, color='purple', linewidth=1)
-            ax2.set_ylabel("% Capital Invested")
-            ax2.set_ylim(0, 100)
-            ax2.grid(alpha=0.3)
-            
-            plt.tight_layout()
-            plt.savefig(output_graph)
-            plt.close(fig) 
-            print(f"✅ Saved visually rich WFO Graph to: {output_graph}\n")
+            print(f"✅ Saved Trade Log to: {output_trades}")
+            print(f"✅ Saved Equity Curve to: {output_equity}\n")
             
     print("🎉 ALL WALK-FORWARD BACKTESTS COMPLETED SUCCESSFULLY!")
 
